@@ -1,0 +1,6 @@
+[filesystem "Eclipse Foundation|16.0.2|-1468826520"]
+	timestampResolution = 1000 microseconds
+	minRacyThreshold = 0 nanoseconds
+[filesystem "Oracle Corporation|18|-1468826520"]
+	timestampResolution = 998 microseconds
+	minRacyThreshold = 0 nanoseconds

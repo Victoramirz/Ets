@@ -1,0 +1,202 @@
+{
+	"name": "java-pmd",
+	"displayName": "Java PMD",
+	"description": "PMD static analysis for Java",
+	"version": "0.6.0",
+	"publisher": "cracrayol",
+	"license": "MIT",
+	"author": {
+		"name": "cracrayol",
+		"email": "contact@cracrayol.org"
+	},
+	"engines": {
+		"vscode": "^1.43.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cracrayol/vscode-java-pmd.git"
+	},
+	"bugs": {
+		"url": "https://github.com/cracrayol/vscode-java-pmd/issues"
+	},
+	"icon": "images/vscode-java-pmd.png",
+	"categories": [
+		"Linters"
+	],
+	"keywords": [
+		"Java",
+		"Static Analysis",
+		"PMD"
+	],
+	"activationEvents": [
+		"onLanguage:java",
+		"onCommand:java-pmd.runWorkspace",
+		"onCommand:java-pmd.runFile",
+		"onCommand:java-pmd.clearProblems"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "java-pmd.runWorkspace",
+				"title": "Static analysis on workspace",
+				"category": "Java PMD"
+			},
+			{
+				"command": "java-pmd.runFile",
+				"title": "Static analysis on file",
+				"category": "Java PMD"
+			},
+			{
+				"command": "java-pmd.clearProblems",
+				"title": "Clear problems",
+				"category": "Java PMD"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Java PMD configuration",
+			"properties": {
+				"javaPMD.pmdBinPath": {
+					"type": "string",
+					"default": "",
+					"description": "(Optional) Path to where PMD was installed"
+				},
+				"javaPMD.rulesets": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"description": "(Optional) Paths to rulesets' xml files."
+				},
+				"javaPMD.runOnFileOpen": {
+					"type": "boolean",
+					"default": false,
+					"description": "Will run static analysis every time a file is opened"
+				},
+				"javaPMD.runOnFileSave": {
+					"type": "boolean",
+					"default": true,
+					"description": "Will run static analysis every time a file is saved"
+				},
+				"javaPMD.runOnFileChange": {
+					"type": "boolean",
+					"default": false,
+					"description": "Will run static analysis every time a file is changed (with a 500ms debounce delay)"
+				},
+				"javaPMD.onFileChangeDebounce": {
+					"type": "integer",
+					"default": 3000,
+					"description": "Debounce interval to wait before running pmd after document change.  Only applicable if `runOnFileChange == true`"
+				},
+				"javaPMD.priorityErrorThreshold": {
+					"type": "number",
+					"default": 1,
+					"description": "Determines at what priority level 'errors' will be added. Anything less will be a warning or hint"
+				},
+				"javaPMD.priorityWarnThreshold": {
+					"type": "number",
+					"default": 3,
+					"description": "Determines at what priority level 'warnings' will be added. Anything less will be a hint"
+				},
+				"javaPMD.showErrors": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show errors in output window"
+				},
+				"javaPMD.showStdOut": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show showStdOut in output window"
+				},
+				"javaPMD.showStdErr": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show showStdErr in output window"
+				},
+				"javaPMD.enableCache": {
+					"type": "boolean",
+					"default": false,
+					"description": "Creates a cache file for PMD to run faster. Will create a .pmdCache file in your workspace"
+				},
+				"javaPMD.additionalClassPaths": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"description": "(Optional) paths to be appended to classpath. Used to find jar files containing custom rule definitions. Can be absolute or relative to workspace."
+				},
+				"javaPMD.commandBufferSize": {
+					"type": "number",
+					"default": "64",
+					"description": "Size of buffer used to collect PMD command output (MB), may need to be increased for very large projects"
+				},
+				"javaPMD.jrePath": {
+					"type": "string",
+					"description": "(Optional) Path to JRE (Folder that contains which contains `bin/java`)"
+				}
+			}
+		},
+		"menus": {
+			"explorer/context": [
+				{
+					"when": "resourceLangId == 'java'",
+					"command": "java-pmd.runFile",
+					"group": "java-pmd"
+				}
+			],
+			"editor/context": [
+				{
+					"when": "resourceLangId == 'java'",
+					"command": "java-pmd.runFile",
+					"group": "java-pmd"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"postversion": "npm run vscode:package && git push --tags && npm run vscode:publish && git push && echo \"Successfully released version $npm_package_version!\"",
+		"vscode:package": "npx vsce package",
+		"vscode:publish": "npx vsce publish",
+		"vscode:prepublish": "npm run build:prod",
+		"build:prod": "webpack --mode production",
+		"build:test": "tsc",
+		"pretest": "npm run build:prod && npm run build:test",
+		"update-pmd": "cd pmd-packager && ./upgrade.sh",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/debounce": "^1.2.0",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.5",
+		"@types/node": "^10.9.4",
+		"@types/vscode": "1.43.0",
+		"@typescript-eslint/eslint-plugin": "^2.30.0",
+		"@typescript-eslint/parser": "^2.30.0",
+		"eslint": "^6.8.0",
+		"eslint-config-prettier": "^6.11.0",
+		"eslint-plugin-prettier": "^3.1.3",
+		"mocha": "^5.2.0",
+		"prettier": "^2.0.5",
+		"ts-loader": "^8.0.2",
+		"tslint": "^5.16.0",
+		"typescript": "^3.8.3",
+		"vscode-test": "^1.3.0",
+		"webpack": "^4.44.1",
+		"webpack-cli": "^3.3.12"
+	},
+	"dependencies": {
+		"debounce": "^1.2.0"
+	},
+	"__metadata": {
+		"id": "3c1dd023-8998-4337-9735-4c4c42f64190",
+		"publisherId": "f285d311-7c93-4ea9-94a7-33ba175531a3",
+		"publisherDisplayName": "cracrayol",
+		"targetPlatform": "undefined",
+		"updated": false,
+		"isPreReleaseVersion": false,
+		"installedTimestamp": 1650558179708
+	}
+}
